@@ -1,13 +1,13 @@
-require_relative "../spec_helper"
+require "spec_helper"
 
 describe "EMR" do
   before do
-    @emr = AWS::EMR.new
+    @emr = Aws::EMR::Client.new
   end
 
-  describe "Job Flows" do
-    subject { @emr.job_flows }
-    it { is_expected have(0).job_flows }
+  describe "Clusters" do
+    subject { @emr.list_clusters.clusters.count }
+    it { is_expected.to eq(0) }
   end
 
 end

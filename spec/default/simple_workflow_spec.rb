@@ -1,13 +1,18 @@
-require_relative "../spec_helper"
+require "spec_helper"
 
 describe "SimpleWorkflow" do
   before do
-    @simple_workflow = AWS::SimpleWorkflow.new
+    @swf = Aws::SWF::Client.new
   end
 
-  describe "Domains" do
-    subject { @simple_workflow.domains }
-    it { is_expected have(0).domains }
+  describe "Registered Domains" do
+    subject { @swf.list_domains(registration_status: "REGISTERED").domain_infos.count }
+    it { is_expected.to eq(0) }
+  end
+
+  describe "Deprecated Domains" do
+    subject { @swf.list_domains(registration_status: "DEPRECATED").domain_infos.count }
+    it { is_expected.to eq(0) }
   end
 
 end

@@ -1,13 +1,13 @@
-require_relative "../spec_helper"
+require "spec_helper"
 
 describe "RDS" do
   before do
-    @rds = AWS::RDS.new
+    @rds = Aws::RDS::Resource.new
   end
 
   describe "DB Instances" do
-    subject { @rds.db_instances }
-    it { is_expected have(0).db_instances }
+    subject { @rds.db_instances.count }
+    it { is_expected.to eq(0) }
   end
 
 end

@@ -1,13 +1,13 @@
-require_relative "../spec_helper"
+require "spec_helper"
 
 describe "ELB" do
   before do
-    @elb = AWS::ELB.new
+    @elasticloadbalancing = Aws::ElasticLoadBalancing::Client.new
   end
 
   describe "Load Balancers" do
-    subject { @elb.load_balancers }
-    it { is_expected have(0).load_balancers }
+    subject { @elasticloadbalancing.describe_load_balancers.load_balancer_descriptions.count }
+    it { is_expected.to eq(0) }
   end
 
 end

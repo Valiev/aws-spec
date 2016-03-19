@@ -1,13 +1,13 @@
-require_relative "../spec_helper"
+require "spec_helper"
 
 describe "ElastiCache" do
   before do
-    @elasti_cache = AWS::ElastiCache.new
+    @elasticache = Aws::ElastiCache::Client.new
   end
 
   describe "Clusters" do
-    subject { @elasti_cache.client.describe_cache_clusters[:cache_clusters] }
-    it { is_expected have(0).clusters }
+    subject { @elasticache.describe_cache_clusters[:cache_clusters].count }
+    it { is_expected.to eq(0) }
   end
 
 end

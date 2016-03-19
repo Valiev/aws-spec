@@ -1,13 +1,13 @@
-require_relative "../spec_helper"
+require "spec_helper"
 
 describe "SimpleDB" do
   before do
-    @simple_db = AWS::SimpleDB.new
+    @simpledb = Aws::SimpleDB::Client.new
   end
 
   describe "Domains" do
-    subject { @simple_db.domains }
-    it { is_expected have(0).domains }
+    subject { @simpledb.list_domains.domain_names.count }
+    it { is_expected.to eq(0) }
   end
 
 end
