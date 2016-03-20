@@ -1,13 +1,13 @@
-require_relative "../spec_helper"
+require "spec_helper"
 
 describe "Redshift" do
   before do
-    @redshift = AWS::Redshift.new
+    @redshift = Aws::Redshift::Client.new
   end
 
   describe "Clusters" do
-    subject { @redshift.client.describe_clusters[:clusters] }
-    it { is_expected have(0).clusters }
+    subject { @redshift.describe_clusters.clusters.count }
+    it { is_expected.to eq(0) }
   end
 
 end

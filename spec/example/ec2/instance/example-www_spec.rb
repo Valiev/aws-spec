@@ -1,52 +1,63 @@
-require_relative "../../../spec_helper"
+require "spec_helper"
 
 describe "EC2" do
   before :all do
-    @ec2 = AWS::EC2.new
+    @ec2 = Aws::EC2::Resource.new
     name = File.basename(__FILE__).split("_spec.rb").first
-    @instance = @ec2.instances.find { |i| i.tags[:Name] == name }
+    @instance = @ec2.instances(filters: [name: "tag:Name", values: [name]]).first
   end
 
   describe "instance" do
-    it { @instance.is_expected_not be_nil }
+    subject { @instance }
+    it { is_expected.to be_truthy }
   end
 
-  describe "Block devices" do
-    before :all do
-      @devices = @instance.block_devices
+  describe "Root Volume" do
+    before do
+      @volume = @instance.volumes.find { |v|
+        v.attachments.find { |a| a.device == @instance.root_device_name }
+      }
     end
-    it { @devices.count.is_expected == 1 }
 
-    describe "/dev/sda1" do
-      before :all do
-        @ebs = @devices.find { |v| v[:device_name] == "/dev/sda1" }[:ebs]
-        @volume = @ec2.volumes[@ebs[:volume_id]]
-      end
+    describe "Delete on Termination" do
+      subject { @volume.attachments[0].delete_on_termination }
+      it { is_expected.to be_truthy }
+    end
 
-      it { @ebs[:delete_on_termination].is_expected be_true }
-      it { @volume.iops.is_expected be_nil }
-      it { @volume.size.is_expected == 8 }
+    describe "IOPS" do
+      subject { @volume.iops }
+      it { is_expected.to eq(24) }
+    end
+
+    describe "Size" do
+      subject { @volume.size }
+      it { is_expected.to eq(8) }
     end
   end
 
   describe "Security Groups" do
-    it { @instance.security_groups.first.name.is_expected == "www" }
+    subject { @instance.security_groups.first.group_name }
+    it { is_expected.to eq("default") }
   end
 
   describe "Private IP Address" do
-    it { @instance.private_ip_address.is_expected == "192.168.10.10" }
+    subject { @instance.private_ip_address }
+    it { is_expected.to eq("xxx.xxx.xxx.xxx") }
   end
 
   describe "Public IP Address" do
-    it { @instance.public_ip_address.is_expected == "54.238.176.185" }
+    subject { @instance.public_ip_address }
+    it { is_expected.to eq("xxx.xxx.xxx.xxx") }
   end
 
   describe "Instance Type" do
-    it { @instance.instance_type.is_expected == "t1.micro" }
+    subject { @instance.instance_type }
+    it { is_expected.to eq("t2.nano") }
   end
 
   describe "AMI Name" do
-    it { @instance.image.name.is_expected == "amzn-ami-pv-2013.03.1.x86_64-ebs" }
+    subject { @instance.image_id }
+    it { is_expected.to eq("ami-xxxxxxxx") }
   end
 
 end

@@ -1,85 +1,86 @@
-require_relative "../spec_helper"
+require "spec_helper"
 
 describe "EC2" do
 
   before do
-    @ec2 = AWS::EC2.new
-    @number_of_az = @ec2.availability_zones.count
+    @client = Aws::EC2::Client.new
+    @ec2 = Aws::EC2::Resource.new(client: @client)
+    @number_of_az = @client.describe_availability_zones.availability_zones.count
   end
 
   describe "VPCs" do
-    subject { @ec2.vpcs }
-    it { is_expected have(1).vpcs }
+    subject { @ec2.vpcs.count }
+    it { is_expected.to eq(3) }
   end
 
   describe "Subnets" do
-    subject { @ec2.subnets }
-    it { is_expected have(@number_of_az).subnets }
+    subject { @ec2.subnets.count }
+    it { is_expected.to eq(@number_of_az) }
   end
 
   describe "VPN Gateways" do
-    subject { @ec2.vpn_gateways }
-    it { is_expected have(0).vpn_gateways }
+    subject { @client.describe_vpn_gateways.vpn_gateways.count }
+    it { is_expected.to eq(0) }
   end
 
   describe "Internet Gateways" do
-    subject { @ec2.internet_gateways }
-    it { is_expected have(1).internet_gateways }
+    subject { @ec2.internet_gateways.count }
+    it { is_expected.to eq(0) }
   end
 
   describe "Customer Gateways" do
-    subject { @ec2.customer_gateways }
-    it { is_expected have(0).customer_gateways }
+    subject { @client.describe_customer_gateways.customer_gateways.count }
+    it { is_expected.to eq(0) }
   end
 
   describe "VPN Connections" do
-    subject { @ec2.vpn_connections }
-    it { is_expected have(0).vpn_connections }
+    subject { @client.describe_vpn_connections.vpn_connections.count }
+    it { is_expected.to eq(0) }
   end
 
   describe "Network ACLs" do
-    subject { @ec2.network_acls }
-    it { is_expected have(1).network_acls }
+    subject { @ec2.network_acls.count }
+    it { is_expected.to eq(1) }
   end
 
   describe "Route Tables" do
-    subject { @ec2.route_tables }
-    it { is_expected have(1).route_tables }
+    subject { @ec2.route_tables.count }
+    it { is_expected.to eq(1) }
   end
 
   describe "DHCP Optinos" do
-    subject { @ec2.dhcp_options }
-    it { is_expected have(1).dhcp_options }
+    subject { @client.describe_dhcp_options.dhcp_options.count }
+    it { is_expected.to eq(1) }
   end
 
   describe "Instances" do
-    subject { @ec2.instances }
-    it { is_expected have(0).instances }
+    subject { @ec2.instances.count }
+    it { is_expected.to eq(0) }
   end
 
   describe "Volumes" do
-    subject { @ec2.volumes }
-    it { is_expected have(0).volumes }
+    subject { @ec2.volumes.count }
+    it { is_expected.to eq(0) }
   end
 
   describe "Elastic IPs" do
-    subject { @ec2.elastic_ips }
-    it { is_expected have(0).elastic_ips }
+    subject { @client.describe_addresses.addresses.count }
+    it { is_expected.to eq(0) }
   end
 
   describe "Key Pairs" do
-    subject { @ec2.key_pairs }
-    it { is_expected have(0).key_pairs }
+    subject { @ec2.key_pairs.count }
+    it { is_expected.to eq(0) }
   end
 
   describe "Snapshots" do
-    subject { @ec2.snapshots.with_owner(:self) }
-    it { is_expected have(0).snapshots }
+    subject { @ec2.snapshots(filters: [name: "owner-alias", values: ["self"]]).count }
+    it { is_expected.to eq(0) }
   end
 
   describe "Security Group" do
-    subject { @ec2.security_groups }
-    it { is_expected have(1).security_groups }
+    subject { @ec2.security_groups.count }
+    it { is_expected.to eq(1) }
   end
 
 end

@@ -1,13 +1,13 @@
-require_relative "../spec_helper"
+require "spec_helper"
 
 describe "DynamoDB" do
   before do
-    @dynamo_db = AWS::DynamoDB.new
+    @dynamodb = Aws::DynamoDB::Client.new
   end
 
   describe "Tables" do
-    subject { @dynamo_db.tables }
-    it { is_expected have(0).tables }
+    subject { @dynamodb.list_tables.table_names.count }
+    it { is_expected.to eq(0) }
   end
 
 end
